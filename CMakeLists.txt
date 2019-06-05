@@ -93,6 +93,7 @@ else()
   message(STATUS "FCL does not use Octomap")
 endif()
 
+
 ADD_REQUIRED_DEPENDENCY("assimp >= 2.0")
 if(ASSIMP_FOUND)
   if (NOT ${ASSIMP_VERSION} VERSION_LESS "2.0.1150")
@@ -104,6 +105,9 @@ if(ASSIMP_FOUND)
     message(STATUS "Assimp version does not have unified headers")
   endif()
 endif()
+
+# Forcefully set the header to use
+SET(HPP_FCL_USE_ASSIMP_UNIFIED_HEADER_NAMES TRUE)
 
 SET(${PROJECT_NAME}_HEADERS
   include/hpp/fcl/collision_data.h
