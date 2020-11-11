@@ -89,6 +89,13 @@ void exposeDistanceAPI ()
       ;
   }
 
+  if(!eigenpy::register_symbolic_link_to_registered_type< std::vector<DistanceRequest> >())
+  {
+    class_< std::vector<DistanceRequest> >("StdVec_DistanceRequest")
+      .def(vector_indexing_suite< std::vector<DistanceRequest> >())
+      ;
+  }
+
   if(!eigenpy::register_symbolic_link_to_registered_type<DistanceResult>())
   {
     class_ <DistanceResult, bases<QueryResult> > ("DistanceResult",
@@ -125,4 +132,12 @@ void exposeDistanceAPI ()
         const CollisionGeometry*, const Transform3f&,
         const CollisionGeometry*, const Transform3f&,
         DistanceRequest&, DistanceResult&) > (&distance));
+
+  class_<ComputeDistance> ("ComputeDistance",
+      doxygen::class_doc<ComputeDistance>(), no_init)
+    .def (dv::init<ComputeDistance, const CollisionGeometry*, const CollisionGeometry*>())
+    .def ("__call__", static_cast< FCL_REAL (ComputeDistance::*)(
+        const Transform3f&, const Transform3f&,
+        DistanceRequest&, DistanceResult&) > (&ComputeDistance::operator()));
+
 }

@@ -53,8 +53,6 @@ namespace hpp
 namespace fcl
 {
 
-const int GST_INDEP HPP_FCL_DEPRECATED = 0;
-
 /// @brief Contact information returned by collision
 struct HPP_FCL_DLLAPI Contact
 {
@@ -157,6 +155,14 @@ struct HPP_FCL_DLLAPI QueryRequest
   {}
 
   void updateGuess(const QueryResult& result);
+
+  /// @brief whether two QueryRequest are the same or not
+  inline bool operator ==(const QueryRequest& other) const
+  {
+    return enable_cached_gjk_guess == other.enable_cached_gjk_guess
+      && cached_gjk_guess == other.cached_gjk_guess
+      && cached_support_func_guess == other.cached_support_func_guess;
+  }
 };
 
 /// @brief base class for all query results
@@ -207,14 +213,6 @@ struct HPP_FCL_DLLAPI CollisionRequest : QueryRequest
   /// See \ref hpp_fcl_collision_and_distance_lower_bound_computation
   FCL_REAL break_distance;
 
-  explicit CollisionRequest(size_t num_max_contacts_,
-                   bool enable_contact_ = false,
-		   bool enable_distance_lower_bound_ = false,
-                   size_t num_max_cost_sources_ = 1,
-                   bool enable_cost_ = false,
-                   bool use_approximate_cost_ = true)
-  HPP_FCL_DEPRECATED;
-
   explicit CollisionRequest(const CollisionRequestFlag flag, size_t num_max_contacts_) :
     num_max_contacts(num_max_contacts_),
     enable_contact(flag & CONTACT),
@@ -234,6 +232,17 @@ struct HPP_FCL_DLLAPI CollisionRequest : QueryRequest
     }
 
   bool isSatisfied(const CollisionResult& result) const;
+
+  /// @brief whether two CollisionRequest are the same or not
+  inline bool operator ==(const CollisionRequest& other) const
+  {
+    return QueryRequest::operator==(other)
+      && num_max_contacts == other.num_max_contacts
+      && enable_contact == other.enable_contact
+      && enable_distance_lower_bound == other.enable_distance_lower_bound
+      && security_margin == other.security_margin
+      && break_distance == other.break_distance;
+  }
 };
 
 /// @brief collision result
@@ -315,7 +324,7 @@ public:
 
   /// @brief reposition Contact objects when fcl inverts them
   /// during their construction.
-  friend void invertResults(CollisionResult& result);
+  void swapObjects();
 };
 
 struct DistanceResult;
@@ -330,17 +339,6 @@ struct HPP_FCL_DLLAPI DistanceRequest : QueryRequest
   FCL_REAL rel_err; // relative error, between 0 and 1
   FCL_REAL abs_err; // absoluate error
 
-  /// \deprecated the last argument should be removed.
-  DistanceRequest(bool enable_nearest_points_,
-                  FCL_REAL rel_err_,
-                  FCL_REAL abs_err_,
-                  int /*unused*/) HPP_FCL_DEPRECATED :
-    enable_nearest_points(enable_nearest_points_),
-    rel_err(rel_err_),
-    abs_err(abs_err_)
-  {
-  }
-
   /// \param enable_nearest_points_ enables the nearest points computation.
   /// \param rel_err_
   /// \param abs_err_
@@ -354,6 +352,15 @@ struct HPP_FCL_DLLAPI DistanceRequest : QueryRequest
   }
 
   bool isSatisfied(const DistanceResult& result) const;
+
+  /// @brief whether two DistanceRequest are the same or not
+  inline bool operator ==(const DistanceRequest& other) const
+  {
+    return QueryRequest::operator==(other)
+      && enable_nearest_points == other.enable_nearest_points
+      && rel_err == other.rel_err
+      && abs_err == other.abs_err;
+  }
 };
 
 /// @brief distance result
@@ -470,11 +477,11 @@ public:
                   && b2 == other.b2;
 
 // TODO: check also that two GeometryObject are indeed equal.
-    if ((o1 != NULL) xor (other.o1 != NULL)) return false;
+    if ((o1 != NULL) ^ (other.o1 != NULL)) return false;
     is_same &= (o1 == other.o1);
 //    else if (o1 != NULL and other.o1 != NULL) is_same &= *o1 == *other.o1;
 
-    if ((o2 != NULL) xor (other.o2 != NULL)) return false;
+    if ((o2 != NULL) ^ (other.o2 != NULL)) return false;
     is_same &= (o2 == other.o2);
 //    else if (o2 != NULL and other.o2 != NULL) is_same &= *o2 == *other.o2;
   

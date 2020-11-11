@@ -156,7 +156,7 @@ namespace fcl
           if (gjk.hasPenetrationInformation(shape)) {
             gjk.getClosestPoints (shape, w0, w1);
             distance = gjk.distance;
-            normal = tf1.getRotation() * (w1 - w0).normalized();
+            normal = tf1.getRotation() * (w0 - w1).normalized();
             p1 = p2 = tf1.transform((w0 + w1) / 2);
           } else {
             details::EPA epa(epa_max_face_num, epa_max_vertex_num, epa_max_iterations, epa_tolerance);
@@ -168,7 +168,7 @@ namespace fcl
             {
               epa.getClosestPoints (shape, w0, w1);
               distance = -epa.depth;
-              normal = -epa.normal;
+              normal = tf1.getRotation() * epa.normal;
               p1 = p2 = tf1.transform(w0 - epa.normal*(epa.depth *0.5));
               assert (distance <= 1e-6);
             } else {
@@ -261,7 +261,7 @@ namespace fcl
             // Return contact points in case of collision
             //p1 = tf1.transform (p1);
             //p2 = tf1.transform (p2);
-            normal = (tf1.getRotation() * (p2 - p1)).normalized();
+            normal = (tf1.getRotation() * (p1 - p2)).normalized();
             p1 = tf1.transform(p1);
             p2 = tf1.transform(p2);
           } else {
@@ -420,7 +420,7 @@ HPP_FCL_DLLAPI bool GJKSolver::shapeDistance<S1, S2> \
 #undef SHAPE_DISTANCE_SPECIALIZATION
 #undef SHAPE_DISTANCE_SPECIALIZATION_BASE
 
-#if __cplusplus < 201103L
+#if !(__cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wc99-extensions"
 #endif
@@ -549,7 +549,7 @@ HPP_FCL_DLLAPI bool GJKSolver::shapeDistance<S1, S2> \
 #undef HPP_FCL_DECLARE_SHAPE_DISTANCE_PAIR
 
   /// \}
-#if __cplusplus < 201103L
+#if !(__cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600))
 #pragma GCC diagnostic pop
 #endif
 }
