@@ -23,7 +23,7 @@
   <depend>boost</depend>
   <depend>assimp</depend>
   <depend>octomap</depend>
-  <depend>eigenpy</depend>
+<!--   <depend>eigenpy</depend> -->
 
   <buildtool_depend>cmake</buildtool_depend>
   <export>
