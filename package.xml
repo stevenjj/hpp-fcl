@@ -23,6 +23,8 @@
   <depend>boost</depend>
   <depend>assimp</depend>
   <depend>octomap</depend>
+  <depend>liboctomap-dev</depend>
+  <depend>libassimp-dev</depend>
 <!--   <depend>eigenpy</depend> -->
 
   <buildtool_depend>cmake</buildtool_depend>
